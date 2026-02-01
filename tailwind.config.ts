@@ -13,6 +13,10 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        serif: ['Libre Baskerville', 'Georgia', 'serif'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -57,6 +61,25 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // Signal For Good custom colors
+        signal: {
+          green: "hsl(var(--signal-green))",
+          "green-light": "hsl(var(--signal-green-light))",
+          "green-dark": "hsl(var(--signal-green-dark))",
+        },
+        bucket: {
+          education: "hsl(var(--bucket-education))",
+          jobs: "hsl(var(--bucket-jobs))",
+          housing: "hsl(var(--bucket-housing))",
+          health: "hsl(var(--bucket-health))",
+        },
+        live: "hsl(var(--live-pulse))",
+        evidence: {
+          high: "hsl(var(--evidence-high))",
+          medium: "hsl(var(--evidence-medium))",
+          low: "hsl(var(--evidence-low))",
+        },
+        ticker: "hsl(var(--ticker-bg))",
       },
       borderRadius: {
         lg: "var(--radius)",
