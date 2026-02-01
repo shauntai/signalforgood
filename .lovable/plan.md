@@ -1,280 +1,454 @@
 
 
-# Signal For Good - Implementation Plan
+# Phase 2: Database Schema, Realtime & Mission Hub
 
 ## Overview
-A public impact lab platform where AI agents debate and publish evidence-scored solutions for **Education, Jobs, Housing, and Health**. The site must feel alive within 1 second, with live debates, real-time metrics, and fully transparent evidence scoring.
+This phase establishes the complete backend infrastructure for Signal For Good, including all database tables, RLS policies for public read access, Supabase Realtime subscriptions, and the full Mission Hub experience with watch modes.
 
 ---
 
-## Phase 1: Foundation & Home Experience
+## Part A: Database Schema (18 Tables)
 
-### 1.1 Design System & Brand Setup
-- Configure brand colors (#3FA047 green primary) and editorial typography
-- Set up Framer Motion for subtle animations
-- Create core UI components: chips, badges, meters, cards
-- Add logo assets (light/dark variants for header)
+### A.1 Core Tables
 
-### 1.2 Home Page - Content-First Layout
-- **Masthead**: Logo, navigation links, search
-- **Bucket Tabs**: Education, Jobs, Housing, Health with color-coded dots
-- **Heartbeat Bar** (sticky): Live debates count, messages last 10 min, citation coverage 24h - with animated value changes
-- **Signal Hub Compact Strip**: Minimal hero (180-240px desktop) with "Watch Live" and "How It Works" CTAs
-- **Live Ticker**: Horizontal auto-scrolling newest messages across all buckets
-- **Live Debates Wall**: Dense 4-5 column grid showing 8-12 debate cards above fold
-- **Today's Highlights**: Best briefs and solutions
-- **Trust Summary**: Evidence and output stats
-- **Footer**
+```text
+┌─────────────────────────────────────────────────────────────────┐
+│                         BUCKETS                                 │
+├─────────────────────────────────────────────────────────────────┤
+│ id (uuid PK), name, slug (unique), color, description,         │
+│ created_at                                                      │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                         AGENTS                                  │
+├─────────────────────────────────────────────────────────────────┤
+│ id (uuid PK), name, role, bias_statement, persona_prompt,      │
+│ avatar_url, is_active, created_at                              │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                         MISSIONS                                │
+├─────────────────────────────────────────────────────────────────┤
+│ id (uuid PK), bucket_id (FK), title, core_question,            │
+│ constraints (jsonb), success_metric, debate_hook,              │
+│ status (enum: draft/live/paused/completed), is_live,           │
+│ started_at, completed_at, created_at, updated_at               │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                     DEBATE_MESSAGES                             │
+├─────────────────────────────────────────────────────────────────┤
+│ id (uuid PK), mission_id (FK), agent_id (FK), round_number,    │
+│ content, lane (enum: proposal/support/counter), created_at     │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                         CLAIMS                                  │
+├─────────────────────────────────────────────────────────────────┤
+│ id (uuid PK), message_id (FK), mission_id (FK), claim_text,    │
+│ claim_type (enum: evidence/precedent/assumption/speculation),  │
+│ confidence (0-100), is_flagged, is_retracted, created_at       │
+└─────────────────────────────────────────────────────────────────┘
+```
 
-### 1.3 Live Debate Cards (Dense, Scannable)
-- Bucket chip with color dot
-- LIVE pill indicator (pulsing)
-- Title + one-line problem preview
-- "Last activity X min"
-- Evidence meter (compact)
-- Stats row: messages/hour, claims total, citation rate %
-- "Watch" CTA
+### A.2 Source & Citation Tables
+
+```text
+┌─────────────────────────────────────────────────────────────────┐
+│                      SOURCE_PACKS                               │
+├─────────────────────────────────────────────────────────────────┤
+│ id (uuid PK), bucket_id (FK), name, description, created_at    │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                         SOURCES                                 │
+├─────────────────────────────────────────────────────────────────┤
+│ id (uuid PK), source_pack_id (FK), title, url, source_type,    │
+│ file_path, metadata (jsonb), created_at                        │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                        CITATIONS                                │
+├─────────────────────────────────────────────────────────────────┤
+│ id (uuid PK), claim_id (FK), source_id (FK), snippet,          │
+│ location_info (jsonb), why_it_matters, created_at              │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### A.3 Output Tables
+
+```text
+┌─────────────────────────────────────────────────────────────────┐
+│                     SOLUTION_CARDS                              │
+├─────────────────────────────────────────────────────────────────┤
+│ id (uuid PK), mission_id (FK), title, content, summary,        │
+│ intended_owner, timeline, cost_band, staffing_assumptions,     │
+│ dependencies, risks_mitigations, success_metrics (jsonb),      │
+│ is_published, created_at                                       │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                      DAILY_BRIEFS                               │
+├─────────────────────────────────────────────────────────────────┤
+│ id (uuid PK), bucket_id (FK), title, content, highlights,      │
+│ published_date, created_at                                     │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                         SCORES                                  │
+├─────────────────────────────────────────────────────────────────┤
+│ id (uuid PK), mission_id (FK), evidence_score, actionability,  │
+│ risk_score, clarity_score, overall_score, citation_coverage,   │
+│ flagged_claim_rate, revision_count, created_at                 │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                      ARTIFACT_VIEWS (Lens Caching)              │
+├─────────────────────────────────────────────────────────────────┤
+│ id (uuid PK), target_type, target_id, lens, locale,            │
+│ local_context (jsonb), content, created_at                     │
+│ UNIQUE(target_type, target_id, lens, local_context)            │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                         REPLAYS                                 │
+├─────────────────────────────────────────────────────────────────┤
+│ id (uuid PK), mission_id (FK), script, duration_seconds,       │
+│ timestamp_jumps (jsonb), created_at                            │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### A.4 Analytics & System Tables
+
+```text
+┌─────────────────────────────────────────────────────────────────┐
+│                      DEBATE_STATS (Fast Home Metrics)           │
+├─────────────────────────────────────────────────────────────────┤
+│ mission_id (uuid PK FK), last_message_at, messages_last_hour,  │
+│ claims_count, citation_coverage, updated_at                    │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                      SYSTEM_STATUS                              │
+├─────────────────────────────────────────────────────────────────┤
+│ id (uuid PK), debates_live, messages_last_10_min,              │
+│ citation_coverage_24h, generation_enabled, budget_state,       │
+│ last_updated                                                   │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                      SIGNALS_AGG (Trends)                       │
+├─────────────────────────────────────────────────────────────────┤
+│ id (uuid PK), bucket_id (nullable FK), window, metrics (jsonb),│
+│ updated_at                                                     │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                      AGENT_STATS                                │
+├─────────────────────────────────────────────────────────────────┤
+│ agent_id (uuid PK FK), debates_participated, avg_evidence,     │
+│ avg_clarity, avg_actionability, updated_at                     │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                         EVENTS (Analytics)                      │
+├─────────────────────────────────────────────────────────────────┤
+│ id (uuid PK), event_name, session_id, page_path, target_type,  │
+│ target_id, metadata (jsonb), created_at                        │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                         EXPORTS                                 │
+├─────────────────────────────────────────────────────────────────┤
+│ id (uuid PK), export_type, target_type, target_id, created_at  │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                         SETTINGS                                │
+├─────────────────────────────────────────────────────────────────┤
+│ key (text PK), value (jsonb), updated_at                       │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### A.5 Comments Table
+
+```text
+┌─────────────────────────────────────────────────────────────────┐
+│                        COMMENTS                                 │
+├─────────────────────────────────────────────────────────────────┤
+│ id (uuid PK), target_type, target_id, content (max 500),       │
+│ status (enum: visible/queued/hidden/removed),                  │
+│ fingerprint_hash, ip_hash, ua_hash, spam_score,                │
+│ created_at                                                     │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### A.6 Admin Role System (Secure)
+
+```text
+┌─────────────────────────────────────────────────────────────────┐
+│                   APP_ROLE (Enum)                               │
+├─────────────────────────────────────────────────────────────────┤
+│ 'admin', 'moderator', 'user'                                   │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                      USER_ROLES                                 │
+├─────────────────────────────────────────────────────────────────┤
+│ id (uuid PK), user_id (FK auth.users), role (app_role),        │
+│ UNIQUE(user_id, role)                                          │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                   has_role() Function                           │
+├─────────────────────────────────────────────────────────────────┤
+│ SECURITY DEFINER function to check roles without recursion     │
+└─────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
-## Phase 2: Database & Backend Infrastructure
+## Part B: RLS Policies
 
-### 2.1 Supabase Setup (Lovable Cloud)
-- Core tables: buckets, agents, missions, debate_rounds, debate_messages, claims, source_packs, sources, citations, solution_cards, daily_briefs, scores, comments
-- New tables: artifact_views, debate_stats, events, exports, settings, system_status, agent_stats, signals_agg
-- Generation job queue table with idempotency
+### Policy Strategy
+- **Public read** on all published content (missions, messages, claims, solutions, briefs, agents, buckets, system_status)
+- **No public write** - all writes go through Edge Functions with service role
+- **Admin-only** for user_roles, settings, and moderation actions
 
-### 2.2 Realtime & Performance
-- Supabase Realtime subscriptions for live updates
-- debate_stats table for fast home wall metrics (no heavy joins)
-- Server-side caching for aggregates
-- RLS policies: public read on published content, service role for agent writes
+### Key Policies
 
-### 2.3 Edge Functions
-- `submit_comment` - rate-limited public comment submission
-- `job_runner` - pulls and executes queued jobs
-- `ensure_missions` - keeps bucket activity filled
-- `run_debate_step` - posts next round messages
-- `extract_claims` - converts messages to labeled claims
-- `attach_citations` - links claims to sources
-- `synthesize_solution` - creates solution cards
-- `generate_replay` - creates 30-second highlight scripts
-- `generate_lens_views` - creates cached lens variants
-- `score_mission` - computes scores
-- `generate_daily_briefs` - bucket briefs
-- `update_signals` - trend aggregates
-- `system_health` - public status metrics
+| Table | SELECT | INSERT/UPDATE/DELETE |
+|-------|--------|---------------------|
+| buckets | Public (true) | Admin only |
+| agents | Public (is_active = true) | Admin only |
+| missions | Public (status in live/completed) | Service role |
+| debate_messages | Public via mission join | Service role |
+| claims | Public via mission join | Service role |
+| solution_cards | Public (is_published = true) | Service role |
+| daily_briefs | Public (true) | Service role |
+| comments | Public (status = visible) | Via Edge Function |
+| system_status | Public (true) | Service role |
+| debate_stats | Public (true) | Service role |
+| user_roles | has_role('admin') | has_role('admin') |
+| settings | has_role('admin') | has_role('admin') |
+| events | None (service role only) | Service role |
+| exports | None (service role only) | Service role |
 
 ---
 
-## Phase 3: Mission Hub Experience
+## Part C: Realtime Subscriptions
 
-### 3.1 Watch Modes (Toggle at Top)
-- **Replay 30s**: Auto-generated highlight reel with timestamp jumps
-- **Live Studio**: Raw stream with rounds, agent roles, realtime updates
-- **Decision View**: Only outputs (Solution, Scorecard, Risks, Metrics)
-- **Evidence View**: Claims ledger, citations, audit-focused
+### Tables with Realtime Enabled
+1. **system_status** - HeartbeatBar updates
+2. **debate_messages** - Live ticker and mission hub
+3. **debate_stats** - Debate wall metrics
+4. **missions** - Status changes (live/completed)
 
-### 3.2 AI Lenses (Top Right Dropdown)
-- Plain English
-- Skeptic
-- Budget
-- Equity
-- Local (user selects city/region/zip for contextual constraints)
-- Lenses transform existing content, stored as cached `artifact_views`
+### Frontend Hooks
 
-### 3.3 Argument Map (Structured, Not Spaghetti)
-- Column 1: Proposals
-- Column 2: Supporting evidence
-- Column 3: Risks and counterpoints
-- Click proposal to see strongest support/counter, what would change minds, confidence
+**New files to create:**
+- `src/hooks/useSystemStatus.ts` - Real-time heartbeat metrics
+- `src/hooks/useDebateMessages.ts` - Real-time message stream
+- `src/hooks/useDebateStats.ts` - Real-time debate wall updates
+- `src/hooks/useMission.ts` - Single mission with realtime
 
----
+### HeartbeatBar Integration
+```text
+Index.tsx
+    │
+    └── useSystemStatus() hook
+            │
+            └── Supabase Realtime subscription
+                    │
+                    └── system_status table updates
+```
 
-## Phase 4: Evidence UX
-
-### 4.1 Claim Labels & Visibility
-- Every claim labeled: evidence, precedent, assumption, speculation
-- Confidence chip (0-100)
-- Citation chip with source title
-- Hover/click shows: citation snippet, location info, "why it matters"
-
-### 4.2 Evidence Ledger
-- Summary view per mission
-- Citation coverage percentage
-- Flagged claims count
-- Retractions/revisions (if agent corrects itself)
-
-### 4.3 Trust Widgets
-- Citation coverage % (last 24h)
-- Flagged claims count
-- Revision count
+### LiveTicker Integration
+```text
+LiveTicker.tsx
+    │
+    └── useRecentMessages() hook
+            │
+            └── Supabase Realtime subscription
+                    │
+                    └── debate_messages (last 10 messages)
+```
 
 ---
 
-## Phase 5: Solutions & Deploy Panel
+## Part D: Mission Hub - Watch Modes
 
-### 5.1 Solution Detail Page
-- Full solution content with evidence backing
-- Scores: evidence, actionability, risk, clarity, overall
+### Route Structure
+```text
+/missions/:id
+    │
+    ├── Watch Mode Toggle (top bar)
+    │   ├── Replay 30s
+    │   ├── Live Studio (default)
+    │   ├── Decision View
+    │   └── Evidence View
+    │
+    ├── AI Lens Dropdown (top right)
+    │   ├── Plain English
+    │   ├── Skeptic
+    │   ├── Budget
+    │   ├── Equity
+    │   └── Local (with location input)
+    │
+    └── Main Content Area (varies by mode)
+```
 
-### 5.2 Deploy Panel (Fundable/Operational)
-- Intended owner: city, nonprofit, district, employer
-- Timeline: 2 weeks, 3 months, 12 months
-- Cost band: $, $$, $$$
-- Staffing assumptions: FTE count and role mix
-- Dependencies
+### Component Architecture
+
+**New files:**
+```text
+src/pages/MissionDetail.tsx (refactor)
+src/components/mission/
+    ├── MissionHeader.tsx          # Title, bucket, status, lenses
+    ├── WatchModeToggle.tsx        # Mode selector tabs
+    ├── LensSelector.tsx           # Dropdown with all lens options
+    ├── modes/
+    │   ├── ReplayMode.tsx         # 30-second highlight with TTS
+    │   ├── LiveStudioMode.tsx     # Raw stream with agent avatars
+    │   ├── DecisionMode.tsx       # Solution + Scorecard + Risks
+    │   └── EvidenceMode.tsx       # Claims ledger + citations
+    ├── ArgumentMap.tsx            # 3-column proposal/support/counter
+    ├── MessageBubble.tsx          # Single debate message
+    ├── ClaimCard.tsx              # Claim with label + confidence
+    ├── CitationPopover.tsx        # Hover/click citation details
+    └── ScoreCard.tsx              # Mission scores display
+```
+
+### Watch Mode Details
+
+**1. Replay 30s Mode**
+- Auto-generated script from `replays` table
+- Browser SpeechSynthesis for audio
+- Timestamp jumps to key moments
+- Play/pause controls
+
+**2. Live Studio Mode**
+- Real-time message stream (via Realtime subscription)
+- Agent avatars with role indicators
+- Round number display
+- Auto-scroll with new messages
+
+**3. Decision Mode**
+- Solution card (if published)
+- Scorecard visualization
 - Risks and mitigations
-- Success metrics with KPIs
+- Success metrics
 
-### 5.3 Exports (Tracked)
-- Export 1-pager (PDF)
-- Export grant blurb (text)
-- Export implementation checklist (markdown)
-- Export budget skeleton (CSV)
-- Track all exports for metrics
+**4. Evidence Mode**
+- Claims ledger table
+- Filter by claim type
+- Citation coverage meter
+- Flagged claims highlight
+- Click-to-expand citation details
 
----
+### AI Lenses Implementation
 
-## Phase 6: Supporting Pages
-
-### 6.1 Signals Page (/signals)
-- Top rising topics (24h)
-- Most debated assumptions (week)
-- Highest evidence missions
-- Highest actionability solutions
-- Most cited sources
-- Bucket-level trends
-- Filterable by bucket and time window
-
-### 6.2 Agents Page (/agents)
-- Agent roster with profile cards
-- Role and bias statement (what they optimize for)
-- Stats: avg evidence score, clarity score, participation count, win rate
-- Most common disagreement partner
-- Recent clips
-
-### 6.3 Other Public Pages
-- `/buckets/:slug` - Bucket-specific feed (live, recent, best)
-- `/missions` - Browse all missions
-- `/briefs` - Daily briefs feed
-- `/briefs/:id` - Brief detail
-- `/about` - How it works + scoring rubric
-- `/open-source` - Repo and license
-- `/policies` - Moderation, safety, transparency
-- `/status` - Public system health (no secrets)
+Lenses transform the *display* of existing content:
+- Check `artifact_views` for cached lens view
+- If not cached, show loading state (generation triggered separately)
+- Apply lens styling/transformation to UI
 
 ---
 
-## Phase 7: Public Comments
+## Part E: Seed Data
 
-### 7.1 Comment System (No Login Required)
-- Comments only on generated content: messages, replays, solutions, briefs
-- Max 500 chars, no links at launch
-- Rate limit: 1 per 3 min/device, max 3 per hour
-- Hashed IP and UA only (privacy)
-- Spam scoring with auto-queue
+### Included in Migration
+1. **4 Buckets** with brand colors
+2. **12 Agents** with full persona prompts (as provided)
+3. **10 sample missions** (subset of the 160 provided, 2-3 per bucket for initial load)
+4. **System settings** with defaults
 
-### 7.2 Moderation
-- Statuses: visible, queued, hidden, removed
-- Admin actions: approve, hide, remove, ban fingerprint
-
----
-
-## Phase 8: Admin Dashboard
-
-### 8.1 Admin Routes (Auth Required)
-- `/admin/login`
-- `/admin` - Overview dashboard
-- `/admin/missions` - CRUD + scheduling + pausing
-- `/admin/agents` - CRUD persona prompts + activation
-- `/admin/source-packs` - CRUD sources + PDFs
-- `/admin/moderation` - Comments queue + actions
-- `/admin/generation` - Budgets, schedules, toggles
-- `/admin/metrics` - Funder dashboard
-- `/admin/reports` - Monthly reports export
-- `/admin/logs` - Job logs and failures
-
-### 8.2 Funder KPI Panels
-- Total debates run, solutions published, daily briefs
-- Average overall score, citation coverage %
-- Actionability average
-- Exports by type
-- Public engagement: comments, time on page, replays watched
-- Cost efficiency: outputs per 1M tokens
-- Improvement rate: score deltas month-over-month
-- Top buckets by engagement and quality
-
-### 8.3 Outcome Framing Metrics
-- % solutions with cost band + staffing + timeline
-- % solutions with at least 3 KPIs
-- % missions that converged to decision
-- Median time from start to solution publish
-
-### 8.4 Shareable Reports
-- Monthly Funder Report PDF
-- CSV of all KPIs
-- Top 10 solutions bundle (PDF)
-- Evidence audit summary (PDF)
-- "Why fund this" weekly summary
+### Data Volume
+- Full 160 missions added via subsequent data insert
+- Source packs and sources added as separate operation
+- Initial debate messages created for live missions
 
 ---
 
-## Phase 9: 24/7 Generation System
+## Part F: Implementation Files
 
-### 9.1 Generation Controls
-- `generation_enabled` boolean
-- `daily_token_budget` and `daily_job_budget`
-- `max_live_missions_per_bucket` (default 1-2)
-- `max_messages_per_mission_per_hour`
-- Optional quiet hours
-- `safety_mode` strict (default on)
+### Database Migration
+Single migration file with:
+- All enum types (mission_status, claim_type, comment_status, app_role, etc.)
+- All 18 tables with proper relationships
+- RLS policies for each table
+- Security definer function `has_role()`
+- Realtime publication for 4 tables
+- Seed data inserts
 
-### 9.2 Auto-Throttle Rules
-- If daily budget exceeded → generation pauses, status banner shows
-- If repeated low quality detected → reduce rate, prioritize improvements
+### New TypeScript Files
 
-### 9.3 Job Queue
-- Idempotency keys, retry with backoff, locking
-- Admin "Run now" buttons for each job type
-- Scheduled intervals as specified (2-60 min depending on job)
+**Hooks (6 files):**
+- `src/hooks/useSystemStatus.ts`
+- `src/hooks/useRecentMessages.ts`
+- `src/hooks/useDebateStats.ts`
+- `src/hooks/useMission.ts`
+- `src/hooks/useClaims.ts`
+- `src/hooks/useSolution.ts`
+
+**Mission Components (12 files):**
+- `src/components/mission/MissionHeader.tsx`
+- `src/components/mission/WatchModeToggle.tsx`
+- `src/components/mission/LensSelector.tsx`
+- `src/components/mission/modes/ReplayMode.tsx`
+- `src/components/mission/modes/LiveStudioMode.tsx`
+- `src/components/mission/modes/DecisionMode.tsx`
+- `src/components/mission/modes/EvidenceMode.tsx`
+- `src/components/mission/ArgumentMap.tsx`
+- `src/components/mission/MessageBubble.tsx`
+- `src/components/mission/ClaimCard.tsx`
+- `src/components/mission/CitationPopover.tsx`
+- `src/components/mission/ScoreCard.tsx`
+
+**Updated Pages:**
+- `src/pages/Index.tsx` - Use real data hooks
+- `src/pages/MissionDetail.tsx` - Full refactor with watch modes
+- `src/components/home/HeartbeatBar.tsx` - Use useSystemStatus
+- `src/components/home/LiveTicker.tsx` - Use useRecentMessages
+- `src/components/home/DebateWall.tsx` - Use useDebateStats
 
 ---
 
-## Phase 10: Seed Data & Polish
+## Technical Notes
 
-### 10.1 Seed Content
-- 4 buckets with distinct colors
-- 12 agents with real persona prompts
-- 40 missions (10 per bucket) with varied constraints
-- 2 source packs per bucket (5+ sources each)
-- At least 1 live mission per bucket on first run
+### Performance Optimizations
+- `debate_stats` table prevents expensive joins on home page
+- Skeleton loaders while data loads
+- Realtime updates are incremental, not full refetch
+- Lens views are cached in `artifact_views`
 
-### 10.2 Performance Targets
-- Time to first content: <1.2s desktop, <2.0s mobile
-- Skeleton loaders for all content
-- Incremental updates (no full page refetch)
+### Security Model
+- All public tables have RLS with public SELECT
+- Comments can only be inserted via Edge Function
+- Admin actions require `has_role('admin')` check
+- No direct client writes to mission content tables
 
----
-
-## Key Technical Notes
-
-- **AI Integration**: Use Lovable AI gateway for all generation (debates, claims, solutions, briefs, lenses)
-- **Browser TTS**: SpeechSynthesis for replay audio (no paid TTS)
-- **Search**: Postgres full-text search initially
-- **Security**: Service role for all agent writes, RLS for public reads, admin role checks
+### TypeScript Types
+After migration, types will auto-regenerate in `src/integrations/supabase/types.ts`
 
 ---
 
 ## Acceptance Criteria
-1. ✅ Home shows 8-12 debate cards above fold, updates live
-2. ✅ Heartbeat bar and ticker update without page reload
-3. ✅ Mission hub supports watch modes and lenses with caching
-4. ✅ Evidence ledger, claim labels, citation coverage visible
-5. ✅ Solutions have Deploy panel and tracked exports
-6. ✅ Signals page shows real aggregated trends
-7. ✅ Admin dashboard includes funder KPIs and report exports
-8. ✅ 24/7 generation with budgets and auto-throttles
-9. ✅ Public comments with rate limits and moderation
-10. ✅ No broken routes, fast performance
+
+1. All 18 tables created with proper relationships
+2. RLS policies allow public read, block public write
+3. HeartbeatBar updates in real-time from system_status
+4. LiveTicker shows latest messages with realtime subscription
+5. DebateWall uses debate_stats for fast metrics
+6. Mission Hub has all 4 watch modes functional
+7. Lens selector displays (caching logic ready for edge functions)
+8. Evidence mode shows claims with labels and citations
+9. Seed data includes 4 buckets, 12 agents, 10 sample missions
+10. No breaking changes to existing routes
 
