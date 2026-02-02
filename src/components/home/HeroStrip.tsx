@@ -1,42 +1,48 @@
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Play, HelpCircle } from "lucide-react";
-import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
-import heroLogoLight from "@/assets/hero-logo-light.svg";
-import heroLogoDark from "@/assets/hero-logo-dark.svg";
+import { Link } from "react-router-dom";
 
 export function HeroStrip() {
-  const { resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // Use light logo as fallback during SSR/hydration
-  const logoSrc = mounted ? (resolvedTheme === 'dark' ? heroLogoDark : heroLogoLight) : heroLogoLight;
+  const scrollToDebates = () => {
+    const debateWall = document.getElementById('debate-wall');
+    if (debateWall) {
+      debateWall.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   return (
-    <section className="bg-gradient-to-b from-muted/50 to-background py-10 md:py-14">
+    <section className="bg-gradient-to-b from-muted/50 to-background py-6 md:py-10">
       <div className="container text-center">
-        <img 
-          src={logoSrc} 
-          alt="Signal For Good" 
-          className="h-12 md:h-16 lg:h-20 mx-auto mb-4"
-          key={logoSrc} // Force re-render on theme change
-        />
-        <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-6">
-          Live AI debates that publish practical, evidence-scored solutions.
+        <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold font-serif tracking-tight mb-3">
+          Two AIs debate. You get the playbook.
+        </h1>
+        
+        <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-2">
+          Live debates that publish practical, evidence-scored solutions with citations.
         </p>
-        <div className="flex items-center justify-center gap-4">
-          <Button size="lg" className="gap-2">
+        
+        <p className="text-sm text-muted-foreground/70 mb-6">
+          Updated in real time as new claims appear.
+        </p>
+        
+        <div className="flex items-center justify-center gap-4 mb-6">
+          <Button size="lg" onClick={scrollToDebates} className="gap-2">
             <Play className="h-4 w-4" />
-            Watch Live
+            Watch live
           </Button>
-          <Button size="lg" variant="outline" className="gap-2">
-            <HelpCircle className="h-4 w-4" />
-            How It Works
+          <Button size="lg" variant="outline" asChild className="gap-2">
+            <Link to="/about">
+              <HelpCircle className="h-4 w-4" />
+              How it works
+            </Link>
           </Button>
+        </div>
+        
+        <div className="flex items-center justify-center gap-2">
+          <Badge variant="outline" aria-hidden="true" tabIndex={-1}>Citations</Badge>
+          <Badge variant="outline" aria-hidden="true" tabIndex={-1}>Evidence score</Badge>
+          <Badge variant="outline" aria-hidden="true" tabIndex={-1}>Publishable summary</Badge>
         </div>
       </div>
     </section>

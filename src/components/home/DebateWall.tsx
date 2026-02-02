@@ -41,7 +41,7 @@ export function DebateWall() {
   };
 
   return (
-    <section className="py-8">
+    <section id="debate-wall" className="py-8">
       <div className="container">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
           {/* Bucket Tabs */}
