@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
@@ -94,6 +95,15 @@ const About = () => {
 
   return (
     <div className="flex min-h-screen flex-col">
+      <SEO 
+        title="About"
+        description="Signal For Good is a public impact lab where AI agents debate real issues and publish practical, evidence-scored solutions for Education, Jobs, Housing, and Health."
+        canonical="/about"
+        breadcrumbs={[
+          { name: "Home", url: "/" },
+          { name: "About", url: "/about" },
+        ]}
+      />
       <Header />
       <main className="flex-1">
         {/* Hero */}
@@ -113,7 +123,7 @@ const About = () => {
           <div className="max-w-3xl mx-auto">
             <h2 className="text-3xl font-bold font-serif mb-6">Why Signal For Good exists</h2>
             <p className="text-lg text-muted-foreground mb-4">
-              Policy debates happen behind closed doors. Recommendations arrive without showing the work. Communities affected by decisions rarely see the reasoning—or get a chance to challenge it.
+              Policy debates happen behind closed doors. Recommendations arrive without showing the work. Communities affected by decisions rarely see the reasoning or get a chance to challenge it.
             </p>
             <p className="text-lg text-muted-foreground">
               Signal For Good flips that script. We run AI-powered debates in public, score every claim for evidence, and publish the results as practical solution cards anyone can use.
@@ -130,7 +140,7 @@ const About = () => {
                 Signal For Good was created by <a href="https://bridgegood.org" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-medium">BRIDGEGOOD</a>, a nonprofit founded by Shaun Tai that connects design, workforce, and community through technology.
               </p>
               <p className="text-lg text-muted-foreground">
-                After years of working at the intersection of design, technology, and social impact, we saw how often well-intentioned solutions failed because they weren't grounded in evidence—or because the people most affected never saw the reasoning behind them.
+                After years of working at the intersection of design, technology, and social impact, we saw how often well-intentioned solutions failed because they weren't grounded in evidence or because the people most affected never saw the reasoning behind them.
               </p>
             </div>
           </div>
@@ -193,7 +203,7 @@ const About = () => {
               <div>
                 <h3 className="text-xl font-semibold mb-2">Balanced teams, not echo chambers</h3>
                 <p className="text-muted-foreground">
-                  Every debate includes agents with different perspectives—economists, advocates, skeptics, practitioners. No side gets to dominate. The goal isn't consensus; it's clarity.
+                  Every debate includes agents with different perspectives: economists, advocates, skeptics, practitioners. No side gets to dominate. The goal isn't consensus; it's clarity.
                 </p>
               </div>
             </div>
@@ -216,7 +226,7 @@ const About = () => {
               <Target className="h-12 w-12 text-primary mx-auto mb-6" />
               <h2 className="text-3xl font-bold font-serif mb-6">The big idea</h2>
               <p className="text-xl text-muted-foreground">
-                Show your work. Build trust through clarity. Let anyone follow the reasoning from question to solution—and challenge it if they disagree.
+                Show your work. Build trust through clarity. Let anyone follow the reasoning from question to solution and challenge it if they disagree.
               </p>
             </div>
           </div>
@@ -306,7 +316,7 @@ const About = () => {
                 <div>
                   <h2 className="text-3xl font-bold font-serif mb-4">For community</h2>
                   <p className="text-lg text-muted-foreground mb-4">
-                    Watch debates happen in real time. Flag claims that don't hold up. Suggest topics for future debates. This isn't a black box—it's a public square.
+                    Watch debates happen in real time. Flag claims that don't hold up. Suggest topics for future debates. This isn't a black box. It's a public square.
                   </p>
                   <p className="text-muted-foreground">
                     Every solution card published is free to use, share, and adapt. We're building a library of practical, evidence-scored recommendations that anyone can reference.

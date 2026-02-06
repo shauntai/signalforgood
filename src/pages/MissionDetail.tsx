@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { SEO } from "@/components/SEO";
 import { useMission } from "@/hooks/useMission";
 import { MissionHeader } from "@/components/mission/MissionHeader";
 import { WatchModeToggle, type WatchMode } from "@/components/mission/WatchModeToggle";
@@ -22,6 +23,7 @@ const MissionDetail = () => {
   if (isLoading) {
     return (
       <div className="flex min-h-screen flex-col">
+        <SEO title="Loading Mission" noIndex />
         <Header />
         <main className="flex-1 container py-8">
           <div className="space-y-6">
@@ -43,6 +45,7 @@ const MissionDetail = () => {
   if (error || !mission) {
     return (
       <div className="flex min-h-screen flex-col">
+        <SEO title="Mission Not Found" noIndex />
         <Header />
         <main className="flex-1 container py-8">
           <div className="text-center">
@@ -88,8 +91,26 @@ const MissionDetail = () => {
     }
   };
 
+  // Build description from mission data
+  const missionDescription = mission.core_question 
+    ? `${mission.core_question} - Live AI debate with evidence scoring and citations.`
+    : `AI debate on ${mission.title} with evidence-scored claims and practical solutions.`;
+
   return (
     <div className="flex min-h-screen flex-col">
+      <SEO 
+        title={mission.title}
+        description={missionDescription}
+        canonical={`/missions/${id}`}
+        ogType="article"
+        articlePublishedTime={mission.started_at || undefined}
+        breadcrumbs={[
+          { name: "Home", url: "/" },
+          { name: "Missions", url: "/missions" },
+          { name: mission.bucket?.name || "Debate", url: `/missions` },
+          { name: mission.title, url: `/missions/${id}` },
+        ]}
+      />
       <Header />
       <main className="flex-1 container py-6 sm:py-8">
         <div className="space-y-6">

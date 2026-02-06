@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 
 const footerLinks = [
+  { label: 'Signals', href: '/signals' },
+  { label: 'Agents', href: '/agents' },
   { label: 'About', href: '/about' },
   { label: 'Open Source', href: '/open-source' },
   { label: 'Policies', href: '/policies' },
@@ -15,7 +17,7 @@ export function Footer() {
           <p className="text-sm text-muted-foreground">
             © {new Date().getFullYear()} Signal For Good. A public impact lab.
           </p>
-          <nav className="flex items-center gap-6">
+          <nav className="flex items-center gap-6 flex-wrap justify-center">
             {footerLinks.map(link => (
               <Link
                 key={link.href}
