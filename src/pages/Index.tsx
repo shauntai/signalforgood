@@ -5,10 +5,15 @@ import { HeroStrip } from "@/components/home/HeroStrip";
 import { LiveTicker } from "@/components/home/LiveTicker";
 import { DebateWall } from "@/components/home/DebateWall";
 import { TrustSummary } from "@/components/home/TrustSummary";
+import { SEO } from "@/components/SEO";
 
 const Index = () => {
   return (
     <div className="flex min-h-screen flex-col">
+      <SEO 
+        canonical="/"
+        description="Live AI debates that publish evidence-scored solutions for education, jobs, housing, and health. Watch AI agents debate real issues in real time."
+      />
       <Header />
       <HeartbeatBar />
       

@@ -1,5 +1,6 @@
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle, Heart, ArrowRight } from "lucide-react";
@@ -8,6 +9,11 @@ import { Link } from "react-router-dom";
 const DonationSuccess = () => {
   return (
     <div className="flex min-h-screen flex-col">
+      <SEO 
+        title="Thank You"
+        description="Thank you for your donation to Signal For Good."
+        noIndex
+      />
       <Header />
       <main className="flex-1 container py-16 flex items-center justify-center">
         <Card className="max-w-lg w-full text-center">
