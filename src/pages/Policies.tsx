@@ -207,6 +207,28 @@ If you encounter accessibility barriers, please contact accessibility@signalforg
 ];
 
 const Policies = () => {
+  // Inject FAQPage JSON-LD
+  useEffect(() => {
+    const faqSchema = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": policies.map((p) => ({
+        "@type": "Question",
+        "name": p.title,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": p.content.replace(/\*\*/g, "").replace(/\n/g, " ").trim().slice(0, 500),
+        },
+      })),
+    };
+    const script = document.createElement("script");
+    script.id = "faq-jsonld";
+    script.type = "application/ld+json";
+    script.textContent = JSON.stringify(faqSchema);
+    document.head.appendChild(script);
+    return () => { script.remove(); };
+  }, []);
+
   const lastUpdated = "January 15, 2026";
 
   return (
