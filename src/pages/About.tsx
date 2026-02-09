@@ -18,21 +18,6 @@ import {
   Heart,
 } from "lucide-react";
 
-const DONATION_PRICES = {
-  oneTime: {
-    10: "price_1Sw94f1elXFyDoHrw1UMV762",
-    25: "price_1Sw94g1elXFyDoHrGPvkYtyg",
-    50: "price_1Sw94h1elXFyDoHr95ULMYFm",
-    100: "price_1Sw94h1elXFyDoHr06tojEfP",
-  },
-  monthly: {
-    10: "price_1Sw94j1elXFyDoHrRxa5bQ92",
-    25: "price_1Sw94k1elXFyDoHrs3BtNNIy",
-    50: "price_1Sw94l1elXFyDoHrqZON8dIc",
-    100: "price_1Sw94l1elXFyDoHr43chxATG",
-  },
-} as const;
-
 const BUCKETS = [
   { name: "Education", icon: GraduationCap, color: "bg-bucket-education", textColor: "text-bucket-education" },
   { name: "Jobs", icon: Briefcase, color: "bg-bucket-jobs", textColor: "text-bucket-jobs" },
@@ -58,11 +43,6 @@ const YEAR_ONE_GOALS = [
 ];
 
 const About = () => {
-  const [isMonthly, setIsMonthly] = useState(false);
-  const [selectedAmount, setSelectedAmount] = useState<10 | 25 | 50 | 100>(25);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleDonate = async () => {
     setIsLoading(true);
     try {
       const priceId = isMonthly 
