@@ -1,238 +1,216 @@
 
-# Full SEO and GEO Optimization Audit for SignalForGood.com
+# Build Complete /donate Page for Signal For Good
 
-## A) Inventory and Crawl Map
+## Overview
 
-### Public Routes Discovered
-
-| Route | Indexable | Has Title | Has Meta | Has H1 | Has SEO Component | Issues Found |
-|-------|-----------|-----------|----------|--------|-------------------|--------------|
-| `/` (Index) | Yes | Via index.html | Via index.html | No (missing!) | No | No H1 on homepage, no per-page SEO |
-| `/about` | Yes | No | No | Yes | No | Missing SEO component, missing meta |
-| `/signals` | Yes | Yes | Yes | Yes | Yes | Good |
-| `/agents` | Yes | Yes | Yes | Yes | Yes | Good |
-| `/open-source` | Yes | Yes | Yes | Yes | Yes | Good |
-| `/policies` | Yes | Yes | Yes | Yes | Yes | Good |
-| `/status` | Yes | Yes | Yes | Yes | Yes | Good |
-| `/missions` | Yes | No | No | Yes | No | Missing SEO, placeholder content |
-| `/missions/:id` | Yes | No | No | Conditional | No | Missing SEO, no structured data |
-| `/donation-success` | No (should noIndex) | No | No | Yes | No | Should be noIndex |
-| `/donation-canceled` | No (should noIndex) | No | No | Yes | No | Should be noIndex |
-| `*` (404) | No | No | No | Yes | No | Needs noIndex |
-
-### Critical Issues Found
-
-1. **No sitemap.xml** - Missing entirely
-2. **Incomplete robots.txt** - Missing Sitemap directive and AI crawler rules
-3. **No llms.txt** - Missing AI discoverability file
-4. **Homepage missing H1** - HeroStrip has no `<h1>` tag
-5. **Client-side rendering only** - Vite SPA, no SSR/SSG
-6. **Missing canonical tags on most pages**
-7. **Multiple pages missing SEO component**
-8. **No breadcrumb schema**
-9. **Domain mismatch** - index.html uses signalforgood.org but actual URL is signalforgood.lovable.app
+Create a robust, high-trust public donation page at `/donate` with animated SVG art, Stripe Checkout integration for custom amounts, external payment links (Venmo, Cash App, PayPal), intent tracking with hashed PII, and full SEO.
 
 ---
 
-## B) Technical SEO Fixes
+## Database Changes (2 new tables)
 
-### B.1 Rendering and Indexability
+### Table: `donation_intents`
+| Column | Type | Notes |
+|--------|------|-------|
+| id | uuid | PK, default gen_random_uuid() |
+| created_at | timestamptz | default now() |
+| method | text | not null (card, venmo, cashapp, paypal_link, paypal_fundraiser) |
+| amount_cents | integer | nullable (null for external methods) |
+| page_path | text | not null |
+| user_agent_hash | text | nullable, SHA-256 hash |
+| ip_hash | text | nullable, SHA-256 hash |
+| status | text | not null, default 'intent' |
+| stripe_session_id | text | nullable |
+| metadata | jsonb | nullable |
 
-**Current State:** Pure client-side SPA using Vite + React. View source shows empty `<div id="root"></div>`.
+RLS: No public read/write. Service role only for inserts. Admin read via `has_role`.
 
-**Action:** Since we cannot implement SSR in this Vite setup without major changes, we will:
-- Ensure all critical meta tags are in index.html (already done)
-- Add JSON-LD structured data for key pages
-- Rely on Google's JavaScript rendering capabilities
-- Document this as a known limitation
+### Table: `donation_events`
+| Column | Type | Notes |
+|--------|------|-------|
+| id | uuid | PK, default gen_random_uuid() |
+| created_at | timestamptz | default now() |
+| provider | text | not null |
+| provider_event_id | text | not null, unique |
+| session_id | text | nullable |
+| amount_cents | integer | not null |
+| currency | text | not null |
+| payment_status | text | not null |
 
-### B.2 robots.txt (Complete Rewrite)
-
-**File: `public/robots.txt`**
-
-Create comprehensive robots.txt with:
-- User-agent rules for major crawlers
-- AI crawler rules (GPTBot, OAI-SearchBot, ClaudeBot)
-- Sitemap reference
-- Disallow rules for non-public routes
-
-### B.3 sitemap.xml (New File)
-
-**File: `public/sitemap.xml`**
-
-Create static sitemap with all public indexable routes:
-- `/`
-- `/about`
-- `/signals`
-- `/agents`
-- `/open-source`
-- `/policies`
-- `/status`
-- `/missions`
-
-Note: Dynamic debate pages (`/missions/:id`) would require a server-side sitemap generator, which is beyond current scope.
-
-### B.4 llms.txt (New File)
-
-**File: `public/llms.txt`**
-
-Create AI discoverability file with:
-- Canonical URLs for all public pages
-- 1-2 line descriptions per URL
-- Purpose statement
-
-### B.5 Canonicalization
-
-Update `index.html` canonical to use actual domain:
-- Change from `https://signalforgood.org/` to `https://signalforgood.com/`
-- Update all OG URLs to match
-
-### B.6 NotFound Page SEO
-
-Update `src/pages/NotFound.tsx`:
-- Add SEO component with noIndex
-- Add proper semantic HTML
-- Add helpful internal links
+RLS: Admin only via `has_role`.
 
 ---
 
-## C) On-Page SEO Fixes
+## Edge Functions
 
-### C.1 Homepage H1 (Critical Fix)
+### 1. `create-donation-checkout` (new)
 
-**File: `src/components/home/HeroStrip.tsx`**
+**Path:** `supabase/functions/create-donation-checkout/index.ts`
 
-The current hero has no `<h1>` tag. The text "Two AIs debate. You get the playbook." should be wrapped in `<h1>`.
+Inputs: `{ amount_cents: number, donor_email?: string, user_agent?: string, ip?: string }`
 
-Wait - looking at the code again, line 10 shows:
-```tsx
-<h1 className="text-3xl md:text-4xl lg:text-5xl font-bold font-serif tracking-tight mb-3">
-  Two AIs debate. You get the playbook.
-</h1>
-```
+Logic:
+- Validate `amount_cents` is between 500 and 2,500,000
+- Hash IP and user_agent with WebCrypto SHA-256 (never store raw)
+- Insert `donation_intents` row with method="card", hashed fields, status="intent"
+- Create Stripe Checkout Session in `payment` mode using `price_data` (not a fixed price ID) with:
+  - Product name: "Donation to Signal For Good"
+  - Amount from input
+  - Success URL: `{origin}/donate?success=1`
+  - Cancel URL: `{origin}/donate?canceled=1`
+  - Metadata: `{ amount_cents, page: "donate", project: "signalforgood", intent_id }`
+- Return `{ session_url }`
+- Uses `STRIPE_SECRET_KEY` (already configured) and `SUPABASE_SERVICE_ROLE_KEY` for DB writes
 
-This IS an h1. Good! But we need to add SEO component to Index page.
+### 2. `track-donation-intent` (new)
 
-### C.2 Add SEO Component to Missing Pages
+**Path:** `supabase/functions/track-donation-intent/index.ts`
 
-Update these pages to include SEO component:
-- `src/pages/Index.tsx` - Add SEO with homepage meta
-- `src/pages/About.tsx` - Add SEO with about page meta
-- `src/pages/Missions.tsx` - Add SEO with missions meta
-- `src/pages/MissionDetail.tsx` - Add dynamic SEO based on mission data
-- `src/pages/DonationSuccess.tsx` - Add SEO with noIndex
-- `src/pages/DonationCanceled.tsx` - Add SEO with noIndex
-- `src/pages/NotFound.tsx` - Add SEO with noIndex
+A lightweight function called when users click external payment links.
 
-### C.3 Footer Navigation Update
+Inputs: `{ method: string, page_path: string, user_agent?: string, ip?: string }`
 
-**File: `src/components/layout/Footer.tsx`**
+Logic:
+- Hash IP and user_agent
+- Insert `donation_intents` row with amount_cents=null, status="external_click"
+- Return success
 
-Add missing pages to footer navigation:
-- Add Signals link
-- Add Agents link
-- Add Missions link (when content is ready)
+### 3. `stripe-webhook` (new, optional but included)
 
----
+**Path:** `supabase/functions/stripe-webhook/index.ts`
 
-## D) Structured Data Enhancements
-
-### D.1 Update index.html JSON-LD
-
-Current structured data is good but needs:
-- Add `potentialAction` with SearchAction
-- Add `SameAs` with actual social media links
-- Fix URL to use actual domain
-
-### D.2 Add BreadcrumbList Schema to SEO Component
-
-Update `src/components/SEO.tsx` to support breadcrumbs:
-- Accept breadcrumb prop
-- Inject BreadcrumbList JSON-LD when provided
-
-### D.3 Add FAQPage Schema to Policies
-
-The Policies page has accordion FAQ-style content that would benefit from FAQPage schema.
+- Verify Stripe signature using `STRIPE_WEBHOOK_SECRET`
+- On `checkout.session.completed`: insert into `donation_events`, update matching `donation_intents` status to "completed"
+- Note: This requires a `STRIPE_WEBHOOK_SECRET` to be configured. Will add a note but not block the build on it.
 
 ---
 
-## E) Domain and URL Fixes
+## New UI Components
 
-### E.1 Correct Domain References
+### 1. `src/pages/Donate.tsx`
+Full page component with all sections from the copy spec. Handles `?success=1` and `?canceled=1` query params to show inline banners. Includes SEO component and DonateAction JSON-LD.
 
-The codebase references `signalforgood.org` but the actual URL is `signalforgood.lovable.app` (or custom domain if configured).
+### 2. `src/components/donate/SignalRainArt.tsx`
+Decorative SVG with:
+- viewBox 0 0 1000 1000
+- 100+ scattered vertical line segments with rounded caps
+- Ring of 30+ segments around center at radius ~170
+- Stroke currentColor, opacity 0.25 light / 0.18 dark
+- Gentle downward drift animation (18s duration) respecting `prefers-reduced-motion`
+- Absolute positioned, pointer-events-none, aria-hidden
 
-Update these files:
-- `index.html` - Update canonical, og:url to correct domain
-- Use relative URLs where possible
+### 3. `src/components/donate/DonateAmountPicker.tsx`
+Four preset buttons ($50, $250, $500, $1,000) with descriptive labels. Custom amount input with $5 minimum validation.
 
----
+### 4. `src/components/donate/DonateCardForm.tsx`
+Optional email field + "Continue to secure checkout" button. Calls `create-donation-checkout` edge function and redirects to Stripe. Shows loading state and error handling.
 
-## F) Files to Create/Modify
+### 5. `src/components/donate/OtherWaysToGive.tsx`
+Three cards for Venmo, Cash App, PayPal with exact copy, links, and helpers. Each click calls `track-donation-intent` before opening link in new tab.
 
-| File | Action | Description |
-|------|--------|-------------|
-| `public/robots.txt` | Rewrite | Complete robots.txt with AI crawlers |
-| `public/sitemap.xml` | Create | Static sitemap for all public routes |
-| `public/llms.txt` | Create | AI discoverability file |
-| `index.html` | Modify | Fix domain, enhance structured data |
-| `src/components/SEO.tsx` | Enhance | Add breadcrumb support, improve flexibility |
-| `src/pages/Index.tsx` | Modify | Add SEO component |
-| `src/pages/About.tsx` | Modify | Add SEO component |
-| `src/pages/Missions.tsx` | Modify | Add SEO component |
-| `src/pages/MissionDetail.tsx` | Modify | Add dynamic SEO |
-| `src/pages/DonationSuccess.tsx` | Modify | Add SEO with noIndex |
-| `src/pages/DonationCanceled.tsx` | Modify | Add SEO with noIndex |
-| `src/pages/NotFound.tsx` | Modify | Complete rewrite with SEO, helpful links |
-| `src/components/layout/Footer.tsx` | Modify | Add missing nav links |
-| `vite.config.ts` | Modify | Remove lovable-tagger reference |
+### 6. `src/components/donate/TransparencyPromise.tsx`
+Static section with bullets and links to /about, /status, /open-source.
 
----
+### 7. `src/components/donate/DonateFAQ.tsx`
+Accordion with 5 Q&A pairs using exact copy provided. Includes FAQPage JSON-LD.
 
-## G) Remove All Lovable Mentions
-
-### Files with Lovable References
-
-1. **vite.config.ts** - Remove `lovable-tagger` import and plugin usage
-
-This is the only file with explicit Lovable references in the codebase (excluding auto-generated files that cannot be edited).
+### 8. `src/components/donate/ContactBlock.tsx`
+Address block with the exact contact info and footer legal text provided.
 
 ---
 
-## H) Implementation Summary
+## Integration Updates
 
-### Phase 1: Technical SEO Infrastructure
-1. Rewrite `public/robots.txt` with AI crawler rules and sitemap reference
-2. Create `public/sitemap.xml` with all public routes
-3. Create `public/llms.txt` for AI discoverability
-4. Fix domain references in `index.html`
+### Router (`src/App.tsx`)
+- Add `import Donate from "./pages/Donate"`
+- Add `<Route path="/donate" element={<Donate />} />`
 
-### Phase 2: On-Page SEO
-5. Add SEO component to Index page
-6. Add SEO component to About page
-7. Add SEO component to Missions page
-8. Add dynamic SEO to MissionDetail page
-9. Add noIndex SEO to donation success/canceled pages
-10. Rewrite NotFound page with proper SEO and helpful links
+### Header (`src/components/layout/Header.tsx`)
+- Add `{ label: 'Donate', href: '/donate' }` to navLinks
+- Style the Donate link as a small CTA button instead of plain text link
 
-### Phase 3: Navigation and Structure
-11. Update Footer with complete navigation
-12. Enhance SEO component with breadcrumb support
+### Footer (`src/components/layout/Footer.tsx`)
+- Add `{ label: 'Donate', href: '/donate' }` to footerLinks
 
-### Phase 4: Cleanup
-13. Remove lovable-tagger from vite.config.ts
+### Home Hero (`src/components/home/HeroStrip.tsx`)
+- Add a third CTA button: "Donate" linking to /donate, using `outline` variant
+
+### About Page (`src/pages/About.tsx`)
+- Add a "Support our work" link/button pointing to /donate in the donation section
+
+### Policies Page (`src/pages/Policies.tsx`)
+- Add a "Support Signal For Good" link to /donate near the contact section
+
+### SEO files
+- Update `public/sitemap.xml` to include `/donate`
+- `public/robots.txt` already allows all public pages
+
+### Config (`supabase/config.toml`)
+- Add `[functions.create-donation-checkout]` with `verify_jwt = false`
+- Add `[functions.track-donation-intent]` with `verify_jwt = false`
+- Add `[functions.stripe-webhook]` with `verify_jwt = false`
 
 ---
 
-## Technical Notes
+## SEO on /donate
 
-### Client-Side Rendering Limitation
-This is a Vite SPA that renders entirely on the client. The meaningful content is NOT present in the initial HTML response. This is a known limitation that would require implementing SSR (with frameworks like Remix or Next.js) or pre-rendering to fully resolve.
+The `<SEO>` component will set:
+- Title: "Donate | Signal For Good"
+- Description: "Support AI education and public transparency. Help keep live debates, citations, and playbooks open to everyone."
+- Canonical: "/donate"
+- OG title: "Donate to Signal For Good"
+- OG description: "Your gift supports AI education and transparency for all. Fund Open Labs, student stipends, scholarships, and public learning campaigns."
 
-However, Google can render JavaScript, and the comprehensive meta tags in index.html plus structured data provide good baseline SEO.
+JSON-LD injected via useEffect:
+- Organization schema (Signal For Good under BRIDGEGOOD)
+- DonateAction potentialAction with target https://signalforgood.com/donate
+- FAQPage schema in the FAQ section
 
-### Domain Configuration
-The published URL is `signalforgood.lovable.app`. If a custom domain `signalforgood.com` is configured, the canonical URLs should point there. I will use `signalforgood.com` as the canonical domain based on the project context.
+---
 
-### Sitemap Limitations
-Dynamic routes like `/missions/:id` cannot be included in a static sitemap. A proper solution would require a server-side sitemap generator that queries the database for all mission IDs.
+## Files Summary
+
+| File | Action |
+|------|--------|
+| `src/pages/Donate.tsx` | Create |
+| `src/components/donate/SignalRainArt.tsx` | Create |
+| `src/components/donate/DonateAmountPicker.tsx` | Create |
+| `src/components/donate/DonateCardForm.tsx` | Create |
+| `src/components/donate/OtherWaysToGive.tsx` | Create |
+| `src/components/donate/TransparencyPromise.tsx` | Create |
+| `src/components/donate/DonateFAQ.tsx` | Create |
+| `src/components/donate/ContactBlock.tsx` | Create |
+| `supabase/functions/create-donation-checkout/index.ts` | Create |
+| `supabase/functions/track-donation-intent/index.ts` | Create |
+| `supabase/functions/stripe-webhook/index.ts` | Create |
+| `src/App.tsx` | Modify (add route) |
+| `src/components/layout/Header.tsx` | Modify (add Donate link) |
+| `src/components/layout/Footer.tsx` | Modify (add Donate link) |
+| `src/components/home/HeroStrip.tsx` | Modify (add Donate CTA) |
+| `src/pages/About.tsx` | Modify (add Donate link) |
+| `src/pages/Policies.tsx` | Modify (add Donate link) |
+| `public/sitemap.xml` | Modify (add /donate) |
+| `supabase/config.toml` | Modify (add function configs) |
+| Database migration | Create donation_intents + donation_events tables |
+
+---
+
+## Acceptance Checklist
+
+- /donate route exists and renders all sections
+- Linked from Header, Footer, Home hero, About page, and Policies page
+- Amount presets ($50, $250, $500, $1,000) and custom amount work
+- "Continue to secure checkout" creates Stripe session and redirects
+- ?success=1 and ?canceled=1 show inline banners
+- External links (Venmo, Cash App, PayPal) open in new tabs
+- Each click inserts a `donation_intents` row with hashed fields only
+- SVG art is visible, subtle, animated, and respects reduced motion
+- Page works in light and dark mode
+- SEO tags, canonical, and JSON-LD present
+- /donate in sitemap
+- No login required anywhere
+- No card data stored on site
+- No raw IP or user agent stored
+- All copy matches the spec exactly
+- Footer legal text uses BRIDGEGOOD domain and EIN
+- Contact section shows correct address and phone
