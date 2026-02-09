@@ -11,6 +11,7 @@ const navLinks = [
   { label: 'Signals', href: '/signals' },
   { label: 'Agents', href: '/agents' },
   { label: 'About', href: '/about' },
+  { label: 'Donate', href: '/donate', cta: true },
 ];
 
 export function Header() {
