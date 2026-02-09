@@ -43,29 +43,6 @@ const YEAR_ONE_GOALS = [
 ];
 
 const About = () => {
-    setIsLoading(true);
-    try {
-      const priceId = isMonthly 
-        ? DONATION_PRICES.monthly[selectedAmount]
-        : DONATION_PRICES.oneTime[selectedAmount];
-      
-      const mode = isMonthly ? "subscription" : "payment";
-
-      const { data, error } = await supabase.functions.invoke("create-donation", {
-        body: { priceId, mode },
-      });
-
-      if (error) throw error;
-      if (data?.url) {
-        window.open(data.url, "_blank");
-      }
-    } catch (error) {
-      console.error("Donation error:", error);
-      toast.error("Failed to start donation. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   return (
     <div className="flex min-h-screen flex-col">
