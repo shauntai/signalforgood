@@ -379,25 +379,24 @@ serve(async (req) => {
     const sourceIdsByBucket: Record<string, string[]> = {};
     for (const [bucket, sources] of Object.entries(SOURCES_BY_BUCKET)) {
       const bucketId = BUCKET_IDS[bucket];
-      // Create source pack
-      const { data: pack } = await supabase
-        .from("source_packs")
-        .upsert({ bucket_id: bucketId, name: `${bucket.charAt(0).toUpperCase() + bucket.slice(1)} Research Library`, description: `Curated research sources for ${bucket} policy debates` }, { onConflict: "bucket_id,name" })
-        .select("id")
-        .single();
-
-      // Check if pack was created or already exists
+      // Create or find source pack
       let packId: string;
-      if (pack) {
-        packId = pack.id;
+      const { data: existingPack } = await supabase
+        .from("source_packs")
+        .select("id")
+        .eq("bucket_id", bucketId)
+        .limit(1)
+        .maybeSingle();
+
+      if (existingPack) {
+        packId = existingPack.id;
       } else {
-        const { data: existing } = await supabase
+        const { data: newPack } = await supabase
           .from("source_packs")
+          .insert({ bucket_id: bucketId, name: `${bucket.charAt(0).toUpperCase() + bucket.slice(1)} Research Library`, description: `Curated research sources for ${bucket} policy debates` })
           .select("id")
-          .eq("bucket_id", bucketId)
-          .limit(1)
           .single();
-        packId = existing!.id;
+        packId = newPack!.id;
       }
 
       sourceIdsByBucket[bucket] = [];
