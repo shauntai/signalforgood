@@ -1,11 +1,8 @@
-import { useState } from "react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import { 
   GraduationCap, 
   Briefcase, 
@@ -19,25 +16,7 @@ import {
   BarChart3,
   MessageSquare,
   Heart,
-  Loader2
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
-
-const DONATION_PRICES = {
-  oneTime: {
-    10: "price_1Sw94f1elXFyDoHrw1UMV762",
-    25: "price_1Sw94g1elXFyDoHrGPvkYtyg",
-    50: "price_1Sw94h1elXFyDoHr95ULMYFm",
-    100: "price_1Sw94h1elXFyDoHr06tojEfP",
-  },
-  monthly: {
-    10: "price_1Sw94j1elXFyDoHrRxa5bQ92",
-    25: "price_1Sw94k1elXFyDoHrs3BtNNIy",
-    50: "price_1Sw94l1elXFyDoHrqZON8dIc",
-    100: "price_1Sw94l1elXFyDoHr43chxATG",
-  },
-} as const;
 
 const BUCKETS = [
   { name: "Education", icon: GraduationCap, color: "bg-bucket-education", textColor: "text-bucket-education" },
@@ -64,34 +43,6 @@ const YEAR_ONE_GOALS = [
 ];
 
 const About = () => {
-  const [isMonthly, setIsMonthly] = useState(false);
-  const [selectedAmount, setSelectedAmount] = useState<10 | 25 | 50 | 100>(25);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleDonate = async () => {
-    setIsLoading(true);
-    try {
-      const priceId = isMonthly 
-        ? DONATION_PRICES.monthly[selectedAmount]
-        : DONATION_PRICES.oneTime[selectedAmount];
-      
-      const mode = isMonthly ? "subscription" : "payment";
-
-      const { data, error } = await supabase.functions.invoke("create-donation", {
-        body: { priceId, mode },
-      });
-
-      if (error) throw error;
-      if (data?.url) {
-        window.open(data.url, "_blank");
-      }
-    } catch (error) {
-      console.error("Donation error:", error);
-      toast.error("Failed to start donation. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -329,69 +280,18 @@ const About = () => {
 
         {/* Donation Section */}
         <section className="py-16 container">
-          <div className="max-w-xl mx-auto">
-            <Card className="border-2">
-              <CardHeader className="text-center pb-2">
-                <Heart className="h-10 w-10 text-destructive mx-auto mb-4" />
-                <CardTitle className="text-2xl font-serif">Support Signal For Good</CardTitle>
-                <p className="text-muted-foreground mt-2">
-                  100% of donations go to site upkeep and operations.
-                </p>
-              </CardHeader>
-              <CardContent className="pt-6">
-                {/* Frequency Toggle */}
-                <div className="flex items-center justify-center gap-3 mb-8">
-                  <Label htmlFor="frequency" className={!isMonthly ? "font-medium" : "text-muted-foreground"}>
-                    One-time
-                  </Label>
-                  <Switch
-                    id="frequency"
-                    checked={isMonthly}
-                    onCheckedChange={setIsMonthly}
-                  />
-                  <Label htmlFor="frequency" className={isMonthly ? "font-medium" : "text-muted-foreground"}>
-                    Monthly
-                  </Label>
-                </div>
-
-                {/* Amount Buttons */}
-                <div className="grid grid-cols-4 gap-3 mb-6">
-                  {([10, 25, 50, 100] as const).map((amount) => (
-                    <Button
-                      key={amount}
-                      variant={selectedAmount === amount ? "default" : "outline"}
-                      onClick={() => setSelectedAmount(amount)}
-                      className="text-lg font-semibold"
-                    >
-                      ${amount}
-                    </Button>
-                  ))}
-                </div>
-
-                {/* Donate Button */}
-                <Button 
-                  size="lg" 
-                  className="w-full text-lg"
-                  onClick={handleDonate}
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="h-5 w-5 animate-spin mr-2" />
-                      Processing...
-                    </>
-                  ) : (
-                    <>
-                      Donate ${selectedAmount}{isMonthly ? "/month" : ""}
-                    </>
-                  )}
-                </Button>
-
-                <p className="text-xs text-center text-muted-foreground mt-4">
-                  Secure payment powered by Stripe
-                </p>
-              </CardContent>
-            </Card>
+          <div className="max-w-xl mx-auto text-center">
+            <Heart className="h-10 w-10 text-destructive mx-auto mb-4" />
+            <h2 className="text-2xl font-bold font-serif mb-2">Support Signal For Good</h2>
+            <p className="text-muted-foreground mb-6">
+              Your gift keeps AI education and transparency open to everyone.
+            </p>
+            <Button size="lg" asChild className="gap-2">
+              <a href="/donate">
+                <Heart className="h-4 w-4" />
+                Donate now
+              </a>
+            </Button>
           </div>
         </section>
       </main>

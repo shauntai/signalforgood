@@ -11,6 +11,7 @@ const navLinks = [
   { label: 'Signals', href: '/signals' },
   { label: 'Agents', href: '/agents' },
   { label: 'About', href: '/about' },
+  { label: 'Donate', href: '/donate', cta: true },
 ];
 
 export function Header() {
@@ -43,7 +44,11 @@ export function Header() {
             <Link
               key={link.href}
               to={link.href}
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              className={
+                (link as any).cta
+                  ? "text-sm font-medium bg-primary text-primary-foreground px-3 py-1.5 rounded-md hover:bg-primary/90 transition-colors"
+                  : "text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              }
             >
               {link.label}
             </Link>

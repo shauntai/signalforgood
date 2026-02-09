@@ -12,6 +12,7 @@ import Missions from "./pages/Missions";
 import MissionDetail from "./pages/MissionDetail";
 import DonationSuccess from "./pages/DonationSuccess";
 import DonationCanceled from "./pages/DonationCanceled";
+import Donate from "./pages/Donate";
 import OpenSource from "./pages/OpenSource";
 import Policies from "./pages/Policies";
 import Status from "./pages/Status";
@@ -33,6 +34,7 @@ const App = () => (
             <Route path="/about" element={<About />} />
             <Route path="/missions" element={<Missions />} />
             <Route path="/missions/:id" element={<MissionDetail />} />
+            <Route path="/donate" element={<Donate />} />
             <Route path="/donation-success" element={<DonationSuccess />} />
             <Route path="/donation-canceled" element={<DonationCanceled />} />
             <Route path="/open-source" element={<OpenSource />} />

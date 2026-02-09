@@ -395,6 +395,78 @@ export type Database = {
           },
         ]
       }
+      donation_events: {
+        Row: {
+          amount_cents: number
+          created_at: string
+          currency: string
+          id: string
+          payment_status: string
+          provider: string
+          provider_event_id: string
+          session_id: string | null
+        }
+        Insert: {
+          amount_cents: number
+          created_at?: string
+          currency: string
+          id?: string
+          payment_status: string
+          provider: string
+          provider_event_id: string
+          session_id?: string | null
+        }
+        Update: {
+          amount_cents?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          payment_status?: string
+          provider?: string
+          provider_event_id?: string
+          session_id?: string | null
+        }
+        Relationships: []
+      }
+      donation_intents: {
+        Row: {
+          amount_cents: number | null
+          created_at: string
+          id: string
+          ip_hash: string | null
+          metadata: Json | null
+          method: string
+          page_path: string
+          status: string
+          stripe_session_id: string | null
+          user_agent_hash: string | null
+        }
+        Insert: {
+          amount_cents?: number | null
+          created_at?: string
+          id?: string
+          ip_hash?: string | null
+          metadata?: Json | null
+          method: string
+          page_path: string
+          status?: string
+          stripe_session_id?: string | null
+          user_agent_hash?: string | null
+        }
+        Update: {
+          amount_cents?: number | null
+          created_at?: string
+          id?: string
+          ip_hash?: string | null
+          metadata?: Json | null
+          method?: string
+          page_path?: string
+          status?: string
+          stripe_session_id?: string | null
+          user_agent_hash?: string | null
+        }
+        Relationships: []
+      }
       events: {
         Row: {
           created_at: string

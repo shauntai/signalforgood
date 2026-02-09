@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Play, HelpCircle } from "lucide-react";
+import { Play, HelpCircle, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export function HeroStrip() {
@@ -35,6 +35,12 @@ export function HeroStrip() {
             <Link to="/about">
               <HelpCircle className="h-4 w-4" />
               How it works
+            </Link>
+          </Button>
+          <Button size="lg" variant="outline" asChild className="gap-2">
+            <Link to="/donate">
+              <Heart className="h-4 w-4" />
+              Donate
             </Link>
           </Button>
         </div>

@@ -337,6 +337,11 @@ const Policies = () => {
                 </div>
               </div>
             </div>
+            <div className="mt-8 text-center">
+              <a href="/donate" className="text-primary hover:underline text-sm font-medium">
+                Support Signal For Good
+              </a>
+            </div>
           </div>
         </section>
       </main>

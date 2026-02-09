@@ -5,6 +5,7 @@ const footerLinks = [
   { label: 'Signals', href: '/signals' },
   { label: 'Agents', href: '/agents' },
   { label: 'About', href: '/about' },
+  { label: 'Donate', href: '/donate' },
   { label: 'Open Source', href: '/open-source' },
   { label: 'Policies', href: '/policies' },
   { label: 'Status', href: '/status' },
