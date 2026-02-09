@@ -1,11 +1,8 @@
-import { useState } from "react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import { 
   GraduationCap, 
   Briefcase, 
@@ -19,10 +16,7 @@ import {
   BarChart3,
   MessageSquare,
   Heart,
-  Loader2
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 
 const DONATION_PRICES = {
   oneTime: {
