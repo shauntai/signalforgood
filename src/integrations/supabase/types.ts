@@ -784,6 +784,8 @@ export type Database = {
           id: string
           last_updated: string
           messages_last_10_min: number | null
+          seed_version: string | null
+          seeded_at: string | null
         }
         Insert: {
           budget_state?: string | null
@@ -793,6 +795,8 @@ export type Database = {
           id?: string
           last_updated?: string
           messages_last_10_min?: number | null
+          seed_version?: string | null
+          seeded_at?: string | null
         }
         Update: {
           budget_state?: string | null
@@ -802,6 +806,8 @@ export type Database = {
           id?: string
           last_updated?: string
           messages_last_10_min?: number | null
+          seed_version?: string | null
+          seeded_at?: string | null
         }
         Relationships: []
       }

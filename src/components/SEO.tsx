@@ -19,7 +19,7 @@ interface SEOProps {
 
 const DEFAULT_TITLE = "Signal For Good";
 const DEFAULT_DESCRIPTION = "Live AI debates that publish evidence-scored solutions for education, jobs, housing, and health. Open, nonstop, and built for public good.";
-const DEFAULT_IMAGE = "https://storage.googleapis.com/gpt-engineer-file-uploads/itMSeWonDzdQbtEdZeUl9lX8IVJ3/social-images/social-1769985303555-signalforgood-1920x1080.jpg";
+const DEFAULT_IMAGE = "https://signalforgood.com/og-image.jpg";
 const SITE_URL = "https://signalforgood.com";
 
 export function SEO({

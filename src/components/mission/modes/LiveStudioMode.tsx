@@ -71,15 +71,26 @@ export function LiveStudioMode({ messages, isLive, isLoading }: LiveStudioModePr
   if (messages.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-muted-foreground">
-          {isLive
-            ? "Waiting for debate to begin..."
-            : "No messages in this debate yet."}
-        </p>
-        {isLive && (
-          <div className="mt-4 flex justify-center">
-            <LivePill />
-          </div>
+        {isLive ? (
+          <>
+            <div className="flex justify-center mb-4">
+              <LivePill />
+            </div>
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <div className="h-4 w-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+              <p className="font-medium">Starting now...</p>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Expect first messages within 60 seconds.
+            </p>
+          </>
+        ) : (
+          <>
+            <p className="font-medium mb-1">Debate transcript loading...</p>
+            <p className="text-sm text-muted-foreground">
+              Content is being prepared.
+            </p>
+          </>
         )}
       </div>
     );

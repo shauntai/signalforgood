@@ -29,7 +29,7 @@ export function LiveTicker() {
   if (messages.length === 0) {
     return (
       <div className="bg-ticker border-y py-2 text-center text-sm text-muted-foreground">
-        No recent messages. Check back soon.
+        Debates cycling. Next update shortly.
       </div>
     );
   }
