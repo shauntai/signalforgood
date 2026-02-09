@@ -12,6 +12,7 @@ import Missions from "./pages/Missions";
 import MissionDetail from "./pages/MissionDetail";
 import DonationSuccess from "./pages/DonationSuccess";
 import DonationCanceled from "./pages/DonationCanceled";
+import Donate from "./pages/Donate";
 import OpenSource from "./pages/OpenSource";
 import Policies from "./pages/Policies";
 import Status from "./pages/Status";
