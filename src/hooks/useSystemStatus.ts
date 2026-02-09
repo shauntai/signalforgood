@@ -16,7 +16,6 @@ export function useSystemStatus() {
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    // Initial fetch
     async function fetchStatus() {
       try {
         const { data, error } = await supabase
@@ -35,6 +34,9 @@ export function useSystemStatus() {
     }
 
     fetchStatus();
+
+    // Poll every 30 seconds
+    const interval = setInterval(fetchStatus, 30_000);
 
     // Subscribe to realtime updates
     const channel = supabase
@@ -55,6 +57,7 @@ export function useSystemStatus() {
       .subscribe();
 
     return () => {
+      clearInterval(interval);
       supabase.removeChannel(channel);
     };
   }, []);
