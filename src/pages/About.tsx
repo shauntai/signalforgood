@@ -329,69 +329,18 @@ const About = () => {
 
         {/* Donation Section */}
         <section className="py-16 container">
-          <div className="max-w-xl mx-auto">
-            <Card className="border-2">
-              <CardHeader className="text-center pb-2">
-                <Heart className="h-10 w-10 text-destructive mx-auto mb-4" />
-                <CardTitle className="text-2xl font-serif">Support Signal For Good</CardTitle>
-                <p className="text-muted-foreground mt-2">
-                  100% of donations go to site upkeep and operations.
-                </p>
-              </CardHeader>
-              <CardContent className="pt-6">
-                {/* Frequency Toggle */}
-                <div className="flex items-center justify-center gap-3 mb-8">
-                  <Label htmlFor="frequency" className={!isMonthly ? "font-medium" : "text-muted-foreground"}>
-                    One-time
-                  </Label>
-                  <Switch
-                    id="frequency"
-                    checked={isMonthly}
-                    onCheckedChange={setIsMonthly}
-                  />
-                  <Label htmlFor="frequency" className={isMonthly ? "font-medium" : "text-muted-foreground"}>
-                    Monthly
-                  </Label>
-                </div>
-
-                {/* Amount Buttons */}
-                <div className="grid grid-cols-4 gap-3 mb-6">
-                  {([10, 25, 50, 100] as const).map((amount) => (
-                    <Button
-                      key={amount}
-                      variant={selectedAmount === amount ? "default" : "outline"}
-                      onClick={() => setSelectedAmount(amount)}
-                      className="text-lg font-semibold"
-                    >
-                      ${amount}
-                    </Button>
-                  ))}
-                </div>
-
-                {/* Donate Button */}
-                <Button 
-                  size="lg" 
-                  className="w-full text-lg"
-                  onClick={handleDonate}
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="h-5 w-5 animate-spin mr-2" />
-                      Processing...
-                    </>
-                  ) : (
-                    <>
-                      Donate ${selectedAmount}{isMonthly ? "/month" : ""}
-                    </>
-                  )}
-                </Button>
-
-                <p className="text-xs text-center text-muted-foreground mt-4">
-                  Secure payment powered by Stripe
-                </p>
-              </CardContent>
-            </Card>
+          <div className="max-w-xl mx-auto text-center">
+            <Heart className="h-10 w-10 text-destructive mx-auto mb-4" />
+            <h2 className="text-2xl font-bold font-serif mb-2">Support Signal For Good</h2>
+            <p className="text-muted-foreground mb-6">
+              Your gift keeps AI education and transparency open to everyone.
+            </p>
+            <Button size="lg" asChild className="gap-2">
+              <a href="/donate">
+                <Heart className="h-4 w-4" />
+                Donate now
+              </a>
+            </Button>
           </div>
         </section>
       </main>

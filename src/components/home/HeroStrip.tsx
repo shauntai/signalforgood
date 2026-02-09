@@ -37,6 +37,12 @@ export function HeroStrip() {
               How it works
             </Link>
           </Button>
+          <Button size="lg" variant="outline" asChild className="gap-2">
+            <Link to="/donate">
+              <Heart className="h-4 w-4" />
+              Donate
+            </Link>
+          </Button>
         </div>
         
         <div className="flex items-center justify-center gap-2">
