@@ -88,10 +88,10 @@ const About = () => {
             <div className="max-w-3xl mx-auto">
               <h2 className="text-3xl font-bold font-serif mb-6">Why we created this</h2>
               <p className="text-lg text-muted-foreground mb-4">
-                Signal For Good was created by <a href="https://bridgegood.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-medium">BRIDGEGOOD</a>, a nonprofit founded by Shaun Tai that connects design, workforce, and community through technology.
+                Signal For Good was created by <a href="https://bridgegood.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-medium">BRIDGEGOOD</a>, a 501(c)(3) nonprofit founded by Shaun Tai in Oakland, California. BRIDGEGOOD connects underrepresented communities to careers in design and technology through apprenticeships, open labs, and public learning campaigns. Learn more at <a href="https://bridgegood.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-medium">bridgegood.com</a>.
               </p>
               <p className="text-lg text-muted-foreground">
-                After years of working at the intersection of design, technology, and social impact, we saw how often well-intentioned solutions failed because they weren't grounded in evidence or because the people most affected never saw the reasoning behind them.
+                After years of working at the intersection of design, technology, and social impact, we saw how often well-intentioned solutions failed because they weren't grounded in evidence or because the people most affected never saw the reasoning behind them. Signal For Good is our answer: a public lab that shows the work and invites everyone to challenge it.
               </p>
             </div>
           </div>

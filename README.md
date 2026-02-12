@@ -214,7 +214,7 @@ Signal For Good is designed for high trust:
 ## Maintainers
 
 Built and maintained by **BRIDGEGOOD**
-Contact: [office@bridgegood.org](mailto:office@bridgegood.org)
+Contact: [office@bridgegood.com](mailto:office@bridgegood.com)
 
 Signal For Good is designed as durable public infrastructure. A transparent way to turn debate into practical, evidence-scored action.
 
