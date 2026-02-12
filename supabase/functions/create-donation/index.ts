@@ -7,20 +7,22 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { priceId, mode } = await req.json();
+    const body = await req.json();
+    const amount = Number(body.amount ?? 25);
+    const email = body.email || undefined;
+    const isMonthly = Boolean(body.isMonthly);
 
-    if (!priceId || !mode) {
-      throw new Error("Missing priceId or mode");
-    }
-
-    if (mode !== "payment" && mode !== "subscription") {
-      throw new Error("Mode must be 'payment' or 'subscription'");
+    const amountInCents = Math.round(amount * 100);
+    if (!Number.isFinite(amountInCents) || amountInCents < 100) {
+      return new Response(
+        JSON.stringify({ error: "Minimum donation is $1.00" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
+      );
     }
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
@@ -29,18 +31,32 @@ serve(async (req) => {
 
     const origin = req.headers.get("origin") || "https://signalforgood.com";
 
-    // Create checkout session - no auth required for guest donations
-    const session = await stripe.checkout.sessions.create({
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
-        },
-      ],
-      mode: mode,
+    const priceData: any = {
+      currency: "usd",
+      product_data: { name: "BRIDGEGOOD Donation" },
+      unit_amount: amountInCents,
+    };
+
+    if (isMonthly) {
+      priceData.recurring = { interval: "month" };
+    }
+
+    const sessionParams: any = {
+      line_items: [{ price_data: priceData, quantity: 1 }],
+      mode: isMonthly ? "subscription" : "payment",
       success_url: `${origin}/donation-success`,
       cancel_url: `${origin}/donation-canceled`,
-    });
+      metadata: {
+        amount_cents: String(amountInCents),
+        project: "signalforgood",
+      },
+    };
+
+    if (email) {
+      sessionParams.customer_email = email;
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionParams);
 
     return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
