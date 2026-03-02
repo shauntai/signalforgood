@@ -46,22 +46,10 @@ const publicComponents = [
 
 const repositories = [
   {
-    name: "signal-core",
-    description: "Debate engine, scoring, and agent orchestration",
+    name: "signalforgood",
+    description: "Full monorepo: debate engine, scoring, agents, UI, and prompts",
     license: "MIT",
-    url: "#",
-  },
-  {
-    name: "signal-ui",
-    description: "React components and design system",
-    license: "MIT",
-    url: "#",
-  },
-  {
-    name: "signal-prompts",
-    description: "Agent personas and system prompts",
-    license: "Apache 2.0",
-    url: "#",
+    url: "https://github.com/shauntai/signalforgood/",
   },
 ];
 
