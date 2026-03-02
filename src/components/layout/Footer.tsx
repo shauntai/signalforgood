@@ -1,4 +1,7 @@
 import { Link } from "react-router-dom";
+import { Github } from "lucide-react";
+
+const GITHUB_URL = "https://github.com/shauntai/signalforgood/";
 
 const footerLinks = [
   { label: 'Missions', href: '/missions' },
