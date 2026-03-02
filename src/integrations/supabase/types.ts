@@ -524,6 +524,72 @@ export type Database = {
         }
         Relationships: []
       }
+      generation_logs: {
+        Row: {
+          citations_created: number | null
+          claims_created: number | null
+          created_at: string
+          cycle_id: string | null
+          cycle_type: string
+          duration_ms: number | null
+          errors: Json | null
+          finished_at: string | null
+          id: string
+          messages_created: number | null
+          metadata: Json | null
+          missions_touched: number | null
+          reason: string | null
+          recycles_done: number | null
+          repairs_done: number | null
+          replays_created: number | null
+          solutions_created: number | null
+          started_at: string
+          status: string
+        }
+        Insert: {
+          citations_created?: number | null
+          claims_created?: number | null
+          created_at?: string
+          cycle_id?: string | null
+          cycle_type?: string
+          duration_ms?: number | null
+          errors?: Json | null
+          finished_at?: string | null
+          id?: string
+          messages_created?: number | null
+          metadata?: Json | null
+          missions_touched?: number | null
+          reason?: string | null
+          recycles_done?: number | null
+          repairs_done?: number | null
+          replays_created?: number | null
+          solutions_created?: number | null
+          started_at?: string
+          status?: string
+        }
+        Update: {
+          citations_created?: number | null
+          claims_created?: number | null
+          created_at?: string
+          cycle_id?: string | null
+          cycle_type?: string
+          duration_ms?: number | null
+          errors?: Json | null
+          finished_at?: string | null
+          id?: string
+          messages_created?: number | null
+          metadata?: Json | null
+          missions_touched?: number | null
+          reason?: string | null
+          recycles_done?: number | null
+          repairs_done?: number | null
+          replays_created?: number | null
+          solutions_created?: number | null
+          started_at?: string
+          status?: string
+        }
+        Relationships: []
+      }
       missions: {
         Row: {
           bucket_id: string
