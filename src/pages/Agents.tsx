@@ -247,9 +247,11 @@ const Agents = () => {
               Every agent prompt is public. You can audit exactly what instructions guide each perspective. 
               If you see a bias or blind spot, propose a fix.
             </p>
-            <Button variant="outline" className="gap-2">
-              <Github className="h-4 w-4" />
-              View prompts on GitHub
+            <Button variant="outline" className="gap-2" asChild>
+              <a href="https://github.com/shauntai/signalforgood/" target="_blank" rel="noopener noreferrer">
+                <Github className="h-4 w-4" />
+                View prompts on GitHub
+              </a>
             </Button>
           </div>
         </section>

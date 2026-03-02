@@ -167,9 +167,11 @@ const OpenSource = () => {
                 We welcome contributions of all kinds: bug fixes, feature suggestions, documentation improvements, and new perspectives on how debates should work.
               </p>
               <div className="flex flex-wrap justify-center gap-4">
-                <Button className="gap-2">
-                  <Github className="h-4 w-4" />
-                  Start contributing
+              <Button className="gap-2" asChild>
+                  <a href="https://github.com/shauntai/signalforgood/" target="_blank" rel="noopener noreferrer">
+                    <Github className="h-4 w-4" />
+                    Start contributing
+                  </a>
                 </Button>
                 <Button variant="outline" className="gap-2">
                   <Users className="h-4 w-4" />
