@@ -43,9 +43,23 @@ export function DecisionMode({ score, solution, isCompleted }: DecisionModeProps
         <div className="mx-auto w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
           <Target className="h-8 w-8 text-muted-foreground" />
         </div>
-        <h3 className="text-lg font-semibold mb-2">Decision Pending</h3>
+        <h3 className="text-lg font-semibold mb-2">Debate still going</h3>
         <p className="text-muted-foreground max-w-md mx-auto">
-          This debate is still in progress. Decision outputs will appear here once agents reach convergence.
+          The agents are still working through this one. Results show up here once they find common ground.
+        </p>
+      </div>
+    );
+  }
+
+  if (isCompleted && !solution) {
+    return (
+      <div className="text-center py-12">
+        <div className="mx-auto w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+          <Target className="h-8 w-8 text-muted-foreground animate-pulse" />
+        </div>
+        <h3 className="text-lg font-semibold mb-2">Wrapping up the results...</h3>
+        <p className="text-muted-foreground max-w-md mx-auto">
+          The debate just finished. We're putting together the final recommendation. Check back in a few minutes.
         </p>
       </div>
     );
