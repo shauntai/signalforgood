@@ -159,11 +159,11 @@ export function DecisionMode({ score, solution, isCompleted }: DecisionModeProps
             )}
           </CardContent>
         </Card>
-      ) : (
+      ) : isCompleted ? (
         <Card>
           <CardContent className="p-6">
             <div className="text-center text-muted-foreground">
-              <p>Solution card is being generated...</p>
+              <p>Putting together the recommendation. Almost there...</p>
               <div className="mt-4 space-y-2">
                 <Skeleton className="h-4 w-3/4 mx-auto" />
                 <Skeleton className="h-4 w-1/2 mx-auto" />
@@ -171,7 +171,7 @@ export function DecisionMode({ score, solution, isCompleted }: DecisionModeProps
             </div>
           </CardContent>
         </Card>
-      )}
+      ) : null}
     </div>
   );
 }
