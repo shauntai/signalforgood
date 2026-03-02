@@ -167,6 +167,5 @@ export function ReplayMode({ replay, missionTitle }: ReplayModeProps) {
 }
 
 function generateDefaultScript(title: string): string {
-  const topic = title.toLowerCase();
-  return `Here's the quick take on ${title}. What should we actually do about ${topic}? The debate brought out strong opinions on all sides. Some pushed for bold action right away. Others said slow down, test it first. In the end, the group found common ground: start with a focused pilot, track the results, and scale what works. Want the full story? Switch to Live Studio mode.`;
+  return `Welcome to the 30-second highlight of "${title}". This debate brought together multiple AI agents with diverse perspectives. Key points emerged around implementation challenges, equity considerations, and measurable outcomes. The discussion highlighted both opportunities and risks, with agents converging on actionable next steps. For the full debate, switch to Live Studio mode.`;
 }

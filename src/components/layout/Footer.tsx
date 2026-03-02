@@ -1,4 +1,7 @@
 import { Link } from "react-router-dom";
+import { Github } from "lucide-react";
+
+const GITHUB_URL = "https://github.com/shauntai/signalforgood/";
 
 const footerLinks = [
   { label: 'Missions', href: '/missions' },
@@ -29,6 +32,15 @@ export function Footer() {
                 {link.label}
               </Link>
             ))}
+            <a
+              href={GITHUB_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+              aria-label="GitHub"
+            >
+              <Github className="h-4 w-4" />
+            </a>
           </nav>
         </div>
       </div>
