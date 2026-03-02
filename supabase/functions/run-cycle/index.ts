@@ -174,7 +174,7 @@ serve(async (req) => {
         .select("id, title, core_question, bucket_id")
         .eq("status", "completed")
         .order("completed_at", { ascending: false })
-        .limit(20);
+        .limit(5);
 
       if (completedMissions) {
         for (const m of completedMissions) {
