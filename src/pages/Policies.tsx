@@ -325,7 +325,7 @@ const Policies = () => {
                     href="mailto:hello@bridgegood.com" 
                     className="text-sm text-primary hover:underline"
                   >
-                    hello@signalforgood.org
+                    hello@bridgegood.com
                   </a>
                 </div>
               </div>
