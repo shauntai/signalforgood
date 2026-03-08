@@ -131,7 +131,7 @@ When errors are identified:
 
 **Report issues**
 
-Flag problematic content using the report button or email editorial@signalforgood.org.
+Flag problematic content using the report button or email hello@bridgegood.com.
     `,
   },
   {
