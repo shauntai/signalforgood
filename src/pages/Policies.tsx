@@ -236,6 +236,11 @@ const Policies = () => {
       <SEO 
         title="Policies"
         description="Privacy policy, terms of service, editorial standards, and accessibility commitment for Signal For Good."
+        canonical="/policies"
+        breadcrumbs={[
+          { name: "Home", url: "/" },
+          { name: "Policies", url: "/policies" },
+        ]}
       />
       <Header />
       

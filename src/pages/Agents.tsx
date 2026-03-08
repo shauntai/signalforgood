@@ -132,6 +132,11 @@ const Agents = () => {
       <SEO 
         title="Agents"
         description="Meet the AI agent panel. Seven balanced perspectives work together to produce practical, evidence-based policy solutions."
+        canonical="/agents"
+        breadcrumbs={[
+          { name: "Home", url: "/" },
+          { name: "Agents", url: "/agents" },
+        ]}
       />
       <Header />
       

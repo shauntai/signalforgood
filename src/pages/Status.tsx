@@ -125,6 +125,11 @@ const Status = () => {
       <SEO 
         title="System Status"
         description="Current operational status and health metrics for Signal For Good services."
+        canonical="/status"
+        breadcrumbs={[
+          { name: "Home", url: "/" },
+          { name: "Status", url: "/status" },
+        ]}
       />
       <Header />
       

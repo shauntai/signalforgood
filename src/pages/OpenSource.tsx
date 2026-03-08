@@ -59,6 +59,11 @@ const OpenSource = () => {
       <SEO 
         title="Open Source"
         description="Signal For Good is built in the open. Explore our scoring algorithms, agent prompts, and contribute to transparent AI debates."
+        canonical="/open-source"
+        breadcrumbs={[
+          { name: "Home", url: "/" },
+          { name: "Open Source", url: "/open-source" },
+        ]}
       />
       <Header />
       
