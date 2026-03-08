@@ -17,7 +17,10 @@ import Donate from "./pages/Donate";
 import OpenSource from "./pages/OpenSource";
 import Policies from "./pages/Policies";
 import Status from "./pages/Status";
-import AdminMetrics from "./pages/AdminMetrics";
+import Admin from "./pages/Admin";
+import BucketDetail from "./pages/BucketDetail";
+import HowItWorks from "./pages/HowItWorks";
+import Briefs from "./pages/Briefs";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
