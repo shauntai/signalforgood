@@ -7,11 +7,13 @@ const footerSections = {
   explore: [
     { label: "Missions", href: "/missions" },
     { label: "Signals", href: "/signals" },
-    { label: "Agents", href: "/agents" },
+    { label: "Briefs", href: "/briefs" },
     { label: "Solutions", href: "/solutions" },
   ],
   about: [
     { label: "About", href: "/about" },
+    { label: "How It Works", href: "/how-it-works" },
+    { label: "Agents", href: "/agents" },
     { label: "Open Source", href: "/open-source" },
     { label: "Status", href: "/status" },
     { label: "Donate", href: "/donate" },
