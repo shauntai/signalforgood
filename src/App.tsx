@@ -10,6 +10,7 @@ import Agents from "./pages/Agents";
 import About from "./pages/About";
 import Missions from "./pages/Missions";
 import MissionDetail from "./pages/MissionDetail";
+import Solutions from "./pages/Solutions";
 import DonationSuccess from "./pages/DonationSuccess";
 import DonationCanceled from "./pages/DonationCanceled";
 import Donate from "./pages/Donate";
@@ -35,6 +36,7 @@ const App = () => (
             <Route path="/about" element={<About />} />
             <Route path="/missions" element={<Missions />} />
             <Route path="/missions/:id" element={<MissionDetail />} />
+            <Route path="/solutions" element={<Solutions />} />
             <Route path="/donate" element={<Donate />} />
             <Route path="/donation-success" element={<DonationSuccess />} />
             <Route path="/donation-canceled" element={<DonationCanceled />} />
@@ -42,6 +44,8 @@ const App = () => (
             <Route path="/policies" element={<Policies />} />
             <Route path="/status" element={<Status />} />
             <Route path="/admin/metrics" element={<AdminMetrics />} />
+            {/* Redirects for legacy routes */}
+            <Route path="/briefs" element={<Signals />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
