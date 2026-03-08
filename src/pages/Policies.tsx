@@ -52,7 +52,7 @@ We use essential cookies only:
 
 **Your rights**
 
-Request data deletion by contacting hello@signalforgood.org.
+Request data deletion by contacting hello@bridgegood.com.
     `,
   },
   {
