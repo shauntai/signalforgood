@@ -14,7 +14,7 @@ interface Brief {
   id: string;
   title: string;
   content: string | null;
-  highlights: any[] | null;
+  highlights: any | null;
   published_date: string;
   bucket_id: string;
   bucket_slug?: string;
