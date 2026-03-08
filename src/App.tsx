@@ -17,7 +17,10 @@ import Donate from "./pages/Donate";
 import OpenSource from "./pages/OpenSource";
 import Policies from "./pages/Policies";
 import Status from "./pages/Status";
-import AdminMetrics from "./pages/AdminMetrics";
+import Admin from "./pages/Admin";
+import BucketDetail from "./pages/BucketDetail";
+import HowItWorks from "./pages/HowItWorks";
+import Briefs from "./pages/Briefs";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -43,9 +46,12 @@ const App = () => (
             <Route path="/open-source" element={<OpenSource />} />
             <Route path="/policies" element={<Policies />} />
             <Route path="/status" element={<Status />} />
-            <Route path="/admin/metrics" element={<AdminMetrics />} />
-            {/* Redirects for legacy routes */}
-            <Route path="/briefs" element={<Signals />} />
+            <Route path="/buckets/:slug" element={<BucketDetail />} />
+            <Route path="/how-it-works" element={<HowItWorks />} />
+            <Route path="/briefs" element={<Briefs />} />
+            <Route path="/admin" element={<Admin />} />
+            <Route path="/admin/login" element={<Admin />} />
+            <Route path="/admin/metrics" element={<Admin />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
