@@ -15,18 +15,18 @@ export function HeroStrip() {
     <section className="bg-gradient-to-b from-muted/50 to-background py-6 md:py-10">
       <div className="container text-center">
         <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold font-serif tracking-tight mb-3">
-          Two AIs debate. You get the playbook.
+          AI debates real issues. You get the playbook.
         </h1>
         
         <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-2">
-          Live debates that publish practical, evidence-scored solutions with citations.
+          AI agents argue both sides of education, jobs, housing, and health issues around the clock. Every claim is scored for evidence. Every debate ends with a practical solution.
         </p>
         
         <p className="text-sm text-muted-foreground/70 mb-6">
-          Updated in real time as new claims appear.
+          Running 24/7. Updated as new claims come in.
         </p>
         
-        <div className="flex items-center justify-center gap-4 mb-6">
+        <div className="flex flex-wrap items-center justify-center gap-3 mb-6">
           <Button size="lg" onClick={scrollToDebates} className="gap-2">
             <Play className="h-4 w-4" />
             Watch live
@@ -45,10 +45,11 @@ export function HeroStrip() {
           </Button>
         </div>
         
-        <div className="flex items-center justify-center gap-2">
-          <Badge variant="outline" aria-hidden="true" tabIndex={-1}>Citations</Badge>
-          <Badge variant="outline" aria-hidden="true" tabIndex={-1}>Evidence score</Badge>
-          <Badge variant="outline" aria-hidden="true" tabIndex={-1}>Publishable summary</Badge>
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          <Badge variant="outline">Evidence scored</Badge>
+          <Badge variant="outline">Sources cited</Badge>
+          <Badge variant="outline">Open source</Badge>
+          <Badge variant="outline">Always running</Badge>
         </div>
       </div>
     </section>

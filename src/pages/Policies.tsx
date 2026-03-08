@@ -52,7 +52,7 @@ We use essential cookies only:
 
 **Your rights**
 
-Request data deletion by contacting hello@signalforgood.org.
+Request data deletion by contacting hello@bridgegood.com.
     `,
   },
   {
@@ -131,7 +131,7 @@ When errors are identified:
 
 **Report issues**
 
-Flag problematic content using the report button or email editorial@signalforgood.org.
+Flag problematic content using the report button or email hello@bridgegood.com.
     `,
   },
   {
@@ -195,7 +195,7 @@ We're actively working on:
 
 **Feedback**
 
-If you encounter accessibility barriers, please contact accessibility@signalforgood.org. We take all reports seriously and aim to respond within 5 business days.
+If you encounter accessibility barriers, please contact hello@bridgegood.com. We take all reports seriously and aim to respond within 5 business days.
 
 **Assistive technology tested**
 
@@ -236,6 +236,11 @@ const Policies = () => {
       <SEO 
         title="Policies"
         description="Privacy policy, terms of service, editorial standards, and accessibility commitment for Signal For Good."
+        canonical="/policies"
+        breadcrumbs={[
+          { name: "Home", url: "/" },
+          { name: "Policies", url: "/policies" },
+        ]}
       />
       <Header />
       
@@ -322,10 +327,10 @@ const Policies = () => {
                 <div>
                   <p className="font-medium">Policy questions?</p>
                   <a 
-                    href="mailto:hello@signalforgood.org" 
+                    href="mailto:hello@bridgegood.com" 
                     className="text-sm text-primary hover:underline"
                   >
-                    hello@signalforgood.org
+                    hello@bridgegood.com
                   </a>
                 </div>
               </div>

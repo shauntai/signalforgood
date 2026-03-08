@@ -17,12 +17,10 @@ export function DebateWall() {
   const filteredMissions = missions
     .filter(m => selectedBucket === "all" || m.bucket.slug === selectedBucket)
     .sort((a, b) => {
+      const aTime = a.stats?.last_message_at ? new Date(a.stats.last_message_at).getTime() : 0;
+      const bTime = b.stats?.last_message_at ? new Date(b.stats.last_message_at).getTime() : 0;
       switch (sortBy) {
         case 'active':
-          // Sort by last message time, most recent first
-          const aTime = a.stats?.last_message_at ? new Date(a.stats.last_message_at).getTime() : 0;
-          const bTime = b.stats?.last_message_at ? new Date(b.stats.last_message_at).getTime() : 0;
-          return bTime - aTime;
         case 'newest':
           return bTime - aTime;
         case 'evidence':
@@ -32,7 +30,6 @@ export function DebateWall() {
       }
     });
 
-  // Calculate time ago for last activity
   const getLastActivityMinutes = (lastMessageAt: string | null): number => {
     if (!lastMessageAt) return 999;
     const now = new Date();
@@ -44,33 +41,30 @@ export function DebateWall() {
     <section id="debate-wall" className="py-8">
       <div className="container">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-          {/* Bucket Tabs */}
           <Tabs value={selectedBucket} onValueChange={setSelectedBucket} className="w-full sm:w-auto">
             <TabsList>
               <TabsTrigger value="all">All</TabsTrigger>
               {BUCKETS.map(bucket => (
                 <TabsTrigger key={bucket.slug} value={bucket.slug} className="gap-1.5">
-                  <span className={`h-2 w-2 rounded-full bg-${bucket.color}`} />
+                  <span className={`h-2 w-2 rounded-full bg-bucket-${bucket.slug}`} />
                   <span className="hidden md:inline">{bucket.name}</span>
                 </TabsTrigger>
               ))}
             </TabsList>
           </Tabs>
 
-          {/* Sort */}
           <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortOption)}>
             <SelectTrigger className="w-[160px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="active">Most Active</SelectItem>
+              <SelectItem value="active">Most active</SelectItem>
               <SelectItem value="newest">Newest</SelectItem>
-              <SelectItem value="evidence">Highest Evidence</SelectItem>
+              <SelectItem value="evidence">Best evidence</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
-        {/* Grid */}
         {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
@@ -81,6 +75,10 @@ export function DebateWall() {
                 <Skeleton className="h-2 w-full" />
               </div>
             ))}
+          </div>
+        ) : filteredMissions.length === 0 ? (
+          <div className="text-center py-12 text-muted-foreground">
+            <p>No debates match this filter. Debates cycle every 2 hours.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
