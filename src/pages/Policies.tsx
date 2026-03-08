@@ -195,7 +195,7 @@ We're actively working on:
 
 **Feedback**
 
-If you encounter accessibility barriers, please contact accessibility@signalforgood.org. We take all reports seriously and aim to respond within 5 business days.
+If you encounter accessibility barriers, please contact hello@bridgegood.com. We take all reports seriously and aim to respond within 5 business days.
 
 **Assistive technology tested**
 
