@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { SEO } from "@/components/SEO";
@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { BucketChip } from "@/components/ui/bucket-chip";
-import { supabase } from "@/integrations/supabase/client";
+import { getStaticBriefs } from "@/data/staticData";
 import { FileText, ChevronDown, ChevronUp } from "lucide-react";
 import { BUCKETS, type BucketSlug } from "@/lib/constants";
 
@@ -21,32 +21,9 @@ interface Brief {
 }
 
 const Briefs = () => {
-  const [briefs, setBriefs] = useState<Brief[]>([]);
-  const [bucketMap, setBucketMap] = useState<Record<string, string>>({});
-  const [isLoading, setIsLoading] = useState(true);
+  const briefs: Brief[] = useMemo(() => getStaticBriefs(), []);
+  const isLoading = false;
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
-
-  useEffect(() => {
-    async function load() {
-      // Fetch buckets for slug mapping
-      const { data: bucketsData } = await supabase.from("buckets").select("id, slug");
-      const bMap: Record<string, string> = {};
-      (bucketsData ?? []).forEach((b) => { bMap[b.id] = b.slug; });
-      setBucketMap(bMap);
-
-      const { data, error } = await supabase
-        .from("daily_briefs")
-        .select("*")
-        .order("published_date", { ascending: false })
-        .limit(50);
-
-      if (!error && data) {
-        setBriefs(data.map((b) => ({ ...b, bucket_slug: bMap[b.bucket_id] })));
-      }
-      setIsLoading(false);
-    }
-    load();
-  }, []);
 
   const toggle = (id: string) => {
     setExpanded((prev) => {
